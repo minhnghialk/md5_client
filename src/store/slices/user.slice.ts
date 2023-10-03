@@ -1,6 +1,8 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 /* eslint-disable @typescript-eslint/no-unused-vars */
 import { createSlice } from "@reduxjs/toolkit";
 import { Socket } from "socket.io-client";
+import { Product } from "./product.slice";
 
 enum UserRole {
   OWNER = "OWNER",
@@ -12,6 +14,14 @@ enum UserStatus {
   ACTIVE = "ACTIVE",
   BANNED = "BANNED",
   TEMPORARY_BAN = "TEMPORARY_BAN",
+}
+
+enum ReceiptStatus {
+  SHOPPING = "SHOPPING",
+  PENDING = "PENDING",
+  ACCEPTED = "ACCEPTED",
+  SHIPPING = "SHIPPING",
+  DONE = "DONE",
 }
 
 export interface User {
@@ -29,16 +39,53 @@ export interface User {
   updateAt: string;
 }
 
-interface UserState {
+export interface Guest {
+  id: string;
+  name: string;
+  numberPhone: string;
+  email: string;
+  receipts: Receipt[];
+}
+
+export interface ReceiptDetail {
+  id: string;
+  receiptId: string;
+  productId: string;
+  product: Product;
+  receipt: Receipt;
+  quantity: number;
+  name: string;
+}
+
+export interface Receipt {
+  id: string;
+  userId: string;
+  guestId: string;
+  user: User;
+  guest: Guest;
+  total: number;
+  status: ReceiptStatus;
+  createAt: string;
+  acceptedAt: string;
+  shipAt: string;
+  doneAt: string;
+  detail: ReceiptDetail[];
+}
+
+export interface UserState {
   data: User | null;
   reLoad: boolean;
   socket: null | Socket;
+  receipts: null | Receipt[];
+  cart: null | Receipt;
 }
 
-const initialState: UserState = {
+export const initialState: UserState = {
   data: null,
   reLoad: false,
   socket: null,
+  receipts: null,
+  cart: null,
 };
 
 const userSlice = createSlice({
@@ -46,7 +93,6 @@ const userSlice = createSlice({
   initialState,
   reducers: {
     setData: function (state, action) {
-      // console.log("action.payload", action.payload);
       return {
         ...state,
         data: action.payload,
@@ -56,6 +102,18 @@ const userSlice = createSlice({
       return {
         ...state,
         socket: action.payload,
+      };
+    },
+    setReceipt: function (state, action) {
+      return {
+        ...state,
+        receipts: action.payload,
+      };
+    },
+    setCart: function (state, action) {
+      return {
+        ...state,
+        cart: action.payload,
       };
     },
     reload: function (state) {

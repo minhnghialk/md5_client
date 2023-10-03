@@ -35,9 +35,23 @@ export default function RouteSetup() {
             () => import("../modules/user/pages/users/ChangePassword")
           )()}
         ></Route>
+        <Route
+          path="login/home"
+          element={Lazy(() => import("../modules/user/pages/homes/Home"))()}
+        ></Route>
 
         {/* Admin */}
         {AdminRoute}
+
+        {/* Cart */}
+        <Route
+          path="cart"
+          element={Lazy(() => import("../modules/user/pages/carts/Cart"))()}
+        ></Route>
+        <Route
+          path="login/cart"
+          element={Lazy(() => import("../modules/user/pages/carts/Cart"))()}
+        ></Route>
       </Routes>
     </BrowserRouter>
   );

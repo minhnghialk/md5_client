@@ -4,9 +4,13 @@ import ProductList from "../../components/ProductList";
 import React from "react";
 import CreateProductForm from "../../components/CreateProductForm";
 import CreateCategoryForm from "../../components/CreateCategoryForm";
+import EditProductForm from "../../components/EditProductForm";
+import { Product } from "@/store/slices/product.slice";
 
 export default function ProductManagement() {
   const [openCreateForm, setOpenCreateForm] = React.useState(false);
+  const [openEditForm, setOpenEditForm] = React.useState(false);
+  const [editProduct, setEditProduct] = React.useState<Product | null>(null);
   const [openCreateCategoryForm, setOpenCreateCategoryForm] =
     React.useState(false);
 
@@ -18,12 +22,25 @@ export default function ProductManagement() {
     setOpenCreateForm(false);
   };
 
+  const handleOpenEditForm = () => {
+    setOpenEditForm(true);
+  };
+
+  const handleCloseEditForm = () => {
+    setOpenEditForm(false);
+  };
+
   const handleOpenCreateCategoryForm = () => {
     setOpenCreateCategoryForm(true);
   };
 
   const handleCloseCreateCategoryForm = () => {
     setOpenCreateCategoryForm(false);
+  };
+
+  const handleRowClick = (product: Product) => {
+    setEditProduct(product);
+    handleOpenEditForm();
   };
 
   const TitleSx = {
@@ -66,7 +83,7 @@ export default function ProductManagement() {
         </Button>
       </Box>
 
-      <ProductList />
+      <ProductList onRowClick={handleRowClick} />
 
       <Modal
         open={openCreateCategoryForm}
@@ -78,6 +95,12 @@ export default function ProductManagement() {
       <Modal open={openCreateForm} onClose={handleCloseCreateForm}>
         <CreateProductForm />
       </Modal>
+
+      {editProduct != null ? (
+        <Modal open={openEditForm} onClose={handleCloseEditForm}>
+          <EditProductForm product={editProduct} />
+        </Modal>
+      ) : null}
     </Box>
   );
 }

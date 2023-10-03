@@ -1,3 +1,4 @@
+/* eslint-disable react-hooks/rules-of-hooks */
 /* eslint-disable @typescript-eslint/no-unused-vars */
 import * as React from "react";
 import { styled } from "@mui/material/styles";
@@ -9,6 +10,8 @@ import ButtonBase from "@mui/material/ButtonBase";
 import apis from "@/services/apis";
 import { AppBar, Button, Container, Stack, Toolbar } from "@mui/material";
 import ListIcon from "@mui/icons-material/List";
+import { useSelector } from "react-redux";
+import { StoreType } from "@/store";
 
 const Img = styled("img")({
   margin: "auto",
@@ -42,15 +45,19 @@ interface Product {
 export default function ColumnsGrid() {
   const [productList, setProductList] = React.useState<Product[]>([]);
   const [visibleProducts, setVisibleProducts] = React.useState<Product[]>([]);
-  const [visibleCount, setVisibleCount] = React.useState<number>(3);
+  const [visibleCount, setVisibleCount] = React.useState<number>(6);
 
   // Mock data for ProductList
   const ProductList: Product[] = [
     // Mock product data, replace with actual data from API
   ];
 
+  const userStore = useSelector((store: StoreType) => {
+    return store.userStore;
+  });
+
   const handleLoadMore = () => {
-    const newVisibleCount = visibleCount + 3;
+    const newVisibleCount = visibleCount + 6;
     setVisibleCount(newVisibleCount);
     setVisibleProducts(ProductList.slice(0, newVisibleCount));
   };
@@ -101,9 +108,16 @@ export default function ColumnsGrid() {
             color="text.secondary"
             paragraph
           >
-            Something short and leading about the collection below—its contents,
-            the creator, etc. Make it short and sweet, but not too short so
-            folks don&apos;t simply skip over it entirely.
+            <p>WHAT DOES ABSOLUT VODKA TASTE LIKE?</p>
+            <br />
+            <p>
+              The ways to enjoy Absolut Vodka Original are almost as many as the
+              number of times it is distilled – countless. Bring your friends or
+              bring yourself. Mix with many or keep it neat. Add soda water,
+              lime juice and a couple of lime slices to serve yourself the
+              perfect Absolut Vodka Soda or pick any of the drinks below. This
+              is One Superb Vodka, Born to Mix.
+            </p>
           </Typography>
           <Stack
             sx={{ pt: 4 }}
@@ -131,7 +145,41 @@ export default function ColumnsGrid() {
               <Typography variant="subtitle1" component="div">
                 ${product.price.toFixed(2)}
               </Typography>
-              <Button variant="outlined">Add to cart</Button>
+              <Button
+                variant="outlined"
+                onClick={() => {
+                  if (userStore.socket) {
+                    console.log("Add to cart - userStore", userStore);
+
+                    // false '' null undefined 0 // falsy
+                    // true 'asdf' {} [] 1 // truethy
+                    const receiptDetails = userStore.cart?.detail || [];
+
+                    const receiptDetailByProductId = receiptDetails.find(
+                      (receiptDetail) => receiptDetail.productId === product.id
+                    );
+
+                    const currentQuantity =
+                      receiptDetailByProductId?.quantity || 0;
+                    console.log("currentQuantity", currentQuantity);
+
+                    const newQuantity = currentQuantity + 1;
+                    console.log("newQuantity", newQuantity);
+
+                    const data = {
+                      receiptId: userStore.cart?.id,
+                      productId: product.id,
+                      quantity: newQuantity,
+                    };
+
+                    console.log("Add to cart - data", data);
+
+                    userStore.socket.emit("addToCart", data);
+                  }
+                }}
+              >
+                Add to cart
+              </Button>
             </Item>
           </Grid>
         ))}

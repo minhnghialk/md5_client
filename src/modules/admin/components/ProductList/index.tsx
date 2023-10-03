@@ -30,7 +30,8 @@ interface Column {
   format?: (
     value: string | number,
     row: Product,
-    onDelete: (productId: number) => void
+    onDelete: (productId: number) => void,
+    onUpdate: (product: Product) => void
   ) => JSX.Element;
 }
 
@@ -59,13 +60,14 @@ const columns: readonly Column[] = [
     format: (
       value: number,
       row: Product,
-      onDelete: (productId: number) => void
+      onDelete: (productId: number) => void,
+      onUpdate: (product: Product) => void
     ) => (
       <div className="toolsContainer">
         <button className="deleteButton" onClick={() => onDelete(row.id)}>
           Delete
         </button>
-        <button className="updateButton" onClick={() => handleUpdate(row.id)}>
+        <button className="updateButton" onClick={() => onUpdate(row)}>
           Update
         </button>
       </div>
@@ -73,7 +75,11 @@ const columns: readonly Column[] = [
   },
 ];
 
-export default function ProductList() {
+interface ProductListProps {
+  onRowClick: (product: Product) => void;
+}
+
+export default function ProductList({ onRowClick }: ProductListProps) {
   const [page, setPage] = React.useState(0);
 
   const [rowsPerPage, setRowsPerPage] = React.useState(10);
@@ -122,6 +128,12 @@ export default function ProductList() {
     setProductList(updatedProductList);
   };
 
+  const handleUpdateProduct = (product: Product) => {
+    console.log("handleUpdateProduct", product);
+    // setOpenEditForm(true)
+    onRowClick(product);
+  };
+
   return (
     <Paper sx={{ width: "100%", overflow: "hidden" }}>
       <TableContainer sx={{ maxHeight: 440 }}>
@@ -140,35 +152,41 @@ export default function ProductList() {
             </TableRow>
           </TableHead>
           <TableBody>
-            {productList
-              .slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
-              .map((row) => {
-                return (
-                  <TableRow hover role="checkbox" tabIndex={-1} key={row.id}>
-                    {columns.map((column) => {
-                      if (column.id === "tools") {
-                        return (
-                          <TableCell key={column.id} align={column.align}>
-                            {column.format &&
-                            typeof column.format === "function"
-                              ? column.format(row.id, row, handleDeleteProduct)
-                              : null}
-                          </TableCell>
-                        );
-                      } else {
-                        const value = row[column.id];
-                        return (
-                          <TableCell key={column.id} align={column.align}>
-                            {column.format && typeof value === "string"
-                              ? column.format(value)
-                              : value}
-                          </TableCell>
-                        );
-                      }
-                    })}
-                  </TableRow>
-                );
-              })}
+            {Array.isArray(productList) &&
+              productList
+                .slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
+                .map((row) => {
+                  return (
+                    <TableRow hover role="checkbox" tabIndex={-1} key={row.id}>
+                      {columns.map((column) => {
+                        if (column.id === "tools") {
+                          return (
+                            <TableCell key={column.id} align={column.align}>
+                              {column.format &&
+                              typeof column.format === "function"
+                                ? column.format(
+                                    row.id,
+                                    row,
+                                    handleDeleteProduct,
+                                    handleUpdateProduct
+                                  )
+                                : null}
+                            </TableCell>
+                          );
+                        } else {
+                          const value = row[column.id];
+                          return (
+                            <TableCell key={column.id} align={column.align}>
+                              {column.format && typeof value === "string"
+                                ? column.format(value)
+                                : value}
+                            </TableCell>
+                          );
+                        }
+                      })}
+                    </TableRow>
+                  );
+                })}
           </TableBody>
         </Table>
       </TableContainer>

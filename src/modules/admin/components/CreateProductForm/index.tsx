@@ -14,8 +14,6 @@ import {
 import React from "react";
 
 import useGetCategoryData from "@modules/admin/hooks/useGetCategoryData";
-// import apiService from "@services/apis";
-// import axios from "axios";
 import apis from "@/services/apis";
 
 interface Picture {

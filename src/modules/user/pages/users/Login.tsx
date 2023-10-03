@@ -15,10 +15,9 @@ import LockOutlinedIcon from "@mui/icons-material/LockOutlined";
 import Typography from "@mui/material/Typography";
 import Container from "@mui/material/Container";
 import { createTheme, ThemeProvider } from "@mui/material/styles";
-import axios from "axios";
 import { useDispatch, useSelector } from "react-redux";
 import { StoreType } from "@/store";
-import { User, userAction } from "@/store/slices/user.slice";
+import { userAction } from "@/store/slices/user.slice";
 import apis from "@/services/apis";
 import { useNavigate } from "react-router-dom";
 
@@ -93,6 +92,8 @@ export default function Login() {
   // }
 
   React.useEffect(() => {
+    console.log("Login userStore", userStore);
+
     if (userStore.data) {
       navigate("home");
     }

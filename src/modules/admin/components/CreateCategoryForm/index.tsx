@@ -56,7 +56,7 @@ export default function CreateCategoryForm() {
     const formData = new FormData();
 
     formData.append(
-      "category",
+      "categories",
       JSON.stringify({
         title: (e.target as any).title.value,
       })

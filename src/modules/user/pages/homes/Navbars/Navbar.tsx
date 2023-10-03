@@ -1,21 +1,41 @@
-
+/* eslint-disable @typescript-eslint/no-unused-vars */
 import LocalMallOutlinedIcon from "@mui/icons-material/LocalMallOutlined";
 import PermIdentityOutlinedIcon from "@mui/icons-material/PermIdentityOutlined";
-
+import { useSelector } from "react-redux";
+import { StoreType } from "@/store";
+import TripOriginIcon from "@mui/icons-material/TripOrigin";
+import LogoutIcon from "@mui/icons-material/Logout";
 
 export default function Navbar() {
+  const userStore = useSelector((store: StoreType) => {
+    return store.userStore;
+  });
+
+  function hanldeLogout() {
+    console.log("Hande Logout");
+  }
+
   return (
     <div>
       <nav className="bg-white border-gray-200 dark:bg-gray-900">
         <div className="max-w-screen-xl flex flex-wrap items-center justify-between mx-auto p-4">
           <a href="https://flowbite.com/" className="flex items-center">
             <img
-              src="https://flowbite.com/docs/images/logo.svg"
+              src="https://www.absolut.com/wp-content/themes/absolut/public/images/favicon/favicon.873f5834a812f66aac962ecaea20ae36.ico"
               className="h-8 mr-3"
               alt="Flowbite Logo"
             />
             <span className="self-center text-2xl font-semibold whitespace-nowrap dark:text-white">
-              Flowbite
+              Absolute Vodka
+              <span>
+                <TripOriginIcon
+                  style={{
+                    fontSize: "12px",
+                    marginLeft: "4px",
+                    marginTop: "4px",
+                  }}
+                />
+              </span>
             </span>
           </a>
           <div className="flex md:order-2">
@@ -79,12 +99,39 @@ export default function Navbar() {
                   cursor: "pointer",
                 }}
               />
+              {/* <span> */}
+              {/* Hi, minhnghia */}
+              {/* {"Hi," + userStore.data?.userName} */}
+              {/* </span> */}
             </a>
+            {userStore.data && userStore.data.userName ? (
+              <>
+                <span>{"Hi," + userStore.data.userName}</span>
+                <p>
+                  <LogoutIcon
+                    style={{
+                      marginLeft: "20px",
+                      marginTop: "18px",
+                      cursor: "pointer",
+                    }}
+                    onClick={() => {
+                      hanldeLogout();
+                    }}
+                  />
+                  Log out
+                </p>
+              </>
+            ) : null}
             <a href="cart">
               <LocalMallOutlinedIcon
                 style={{ marginLeft: "15px", cursor: "pointer" }}
                 href=""
               />
+              <span>
+                {userStore.cart?.detail.reduce((value, current) => {
+                  return (value += current.quantity);
+                }, 0)}
+              </span>
             </a>
 
             <button

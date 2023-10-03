@@ -7,8 +7,7 @@ import RouteSetup from "./routes/RouteSetup";
 import { useSelector, useDispatch } from "react-redux";
 import { StoreType } from "./store";
 import { useEffect } from "react";
-import axios from "axios";
-import { User, userAction } from "./store/slices/user.slice";
+import { Receipt, User, userAction } from "./store/slices/user.slice";
 import { Socket, io } from "socket.io-client";
 
 function App() {
@@ -52,6 +51,7 @@ function App() {
               console.log(data.message);
             } else {
               console.log(data.message);
+              // localStorage.removeItem("token");
             }
           }
         );
@@ -62,8 +62,29 @@ function App() {
         });
 
         socket.on("receiveUserData", (user: User) => {
+          console.log("receiveUserData", user);
+
           dispatch(userAction.setData(user));
         });
+
+        socket.on("receiveReceipt", (receipts: Receipt[]) => {
+          console.log("receiveReceipt", receipts);
+          dispatch(userAction.setReceipt(receipts));
+        });
+
+        socket.on("receiveCart", (cart: Receipt) => {
+          console.log("onInitCart - receiveCart", cart);
+          dispatch(userAction.setCart(cart));
+        });
+
+        socket.on("onUpdateCart", (cart: Receipt) => {
+          console.log("onUpdateCart", cart);
+          dispatch(userAction.setCart(cart));
+          console.log("onUpdateCart cart.detail", cart.detail?.[0]?.quantity);
+
+          // alert(`Your cart has been updated`);
+        });
+
         dispatch(userAction.setSocket(socket));
       }
     }
@@ -73,9 +94,12 @@ function App() {
     console.log("userData", userStore.data);
   }, [userStore.data]);
 
+  useEffect(() => {
+    console.log("userDataCart", userStore.cart);
+  }, [userStore.cart]);
+
   return (
     <>
-      <h1>Hello</h1>
       {/* Routing */}
       <RouteSetup />
     </>
